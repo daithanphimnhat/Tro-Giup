@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Web Của Tôi - Google Search Không Lọc & Shortcuts</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+        header {
+            background: #007bff;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+        }
+        main {
+            max-width: 800px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin-bottom: 10px;
+        }
+        h2 {
+            margin-bottom: 15px;
+            color: #007bff;
+        }
+        p {
+            margin-bottom: 15px;
+        }
+        
+        /* Style cho khung tìm kiếm */
+        .search-container {
+            background-color: #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #dee2e6;
+        }
+        .search-form {
+            display: flex;
+            gap: 10px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+        input[type="text"]:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+        button[type="submit"] {
+            padding: 12px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        button[type="submit"]:hover {
+            background-color: #218838;
+        }
+
+        /* Style cho khu vực chứa các nút chuyển hướng nhanh */
+        .quick-links-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px dashed #e9ecef;
+        }
+        .quick-links-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .quick-link-btn {
+            display: inline-block;
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 18px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+        .quick-link-btn:hover {
+            background-color: #495057;
+            transform: translateY(-2px);
+        }
+
+        .note-list {
+            font-size: 0.9em;
+            color: #555;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px 15px;
+            margin-top: 25px;
+            border-radius: 0 4px 4px 0;
+        }
+        .note-list ul {
+            padding-left: 20px;
+            margin-top: 5px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Tìm Kiếm & Lối Tắt Web</h1>
+        <p>Tìm kiếm trực tiếp trên Google với các tham số tự động tắt bộ lọc</p>
+    </header>
+
+    <main>
+        <h2>Ô Tìm Kiếm Không Lọc (Unfiltered Search)</h2>
+        <p>Nhập từ khóa vào ô bên dưới để chuyển hướng sang Google mà không bị áp dụng các bộ lọc cá nhân hóa hay SafeSearch.</p>
+
+        <!-- Form tìm kiếm gửi đến Google -->
+        <div class="search-container">
+            <form action="https://www.google.com/search" method="GET" target="_blank" class="search-form">
+                <input type="text" name="q" placeholder="Nhập từ khóa cần tìm kiếm..." required>
+                
+                <!-- Các tham số ẩn tắt lọc -->
+                <input type="hidden" name="safe" value="off"> <!-- Tắt SafeSearch -->
+                <input type="hidden" name="pws" value="0">   <!-- Tắt Cá nhân hóa -->
+
+                <button type="submit">Tìm trên Google</button>
+            </form>
+        </div>
+
+        <!-- Khu vực hiển thị các nút chuyển hướng từ JS -->
+        <div class="quick-links-section">
+            <h2>Lối Tắt Nhanh (Quick Links)</h2>
+            <p>Danh sách các trang web được tải động từ file <code>sites.js</code>:</p>
+            <div id="quick-links-container" class="quick-links-grid">
+                <!-- Các nút sẽ tự động được thêm vào đây bằng JavaScript -->
+            </div>
+        </div>
+
+        <div class="note-list">
+            <strong>Các tham số được gắn sẵn để tắt bộ lọc:</strong>
+            <ul>
+                <li><code>safe=off</code>: Tắt bộ lọc SafeSearch.</li>
+                <li><code>pws=0</code>: Tắt cá nhân hóa kết quả (xem kết quả khách quan).</li>
+                <li><code>filter=0</code>: Hiển thị đầy đủ mọi kết quả, kể cả các trang trùng lặp/rác bị ẩn.</li>
+                <li><code>nfpr=1</code>: Giữ nguyên chính xác từ khóa bạn gõ mà không tự sửa.</li>
+            </ul>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 - Trang Web Tĩnh GitHub Pages</p>
+    </footer>
+
+    <!-- Nhúng file JavaScript quản lý danh sách URL -->
+    <script src="sites.js"></script>
+</body>
+</html>
