@@ -1,29 +1,73 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Trang Web Của Tôi - Google Search Không Lọc & Shortcuts</title>
-    <!-- Nhúng Font Inter giúp giao diện tinh tế hơn -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <style>
+        /* ===== Biến toàn cục ===== */
         :root {
             --primary: #4f46e5;
             --primary-hover: #4338ca;
+            --primary-light: #eef2ff;
             --bg-gradient: linear-gradient(135deg, #f0f4ff 0%, #e8eefb 100%);
             --card-bg: #ffffff;
             --text-main: #1e293b;
-            --text-muted: #64748b;
+            --text-muted: #475569;       /* tăng độ tương phản */
             --border-color: #e2e8f0;
             --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
-            
-            /* Social colors */
+            --btn-shortcut-bg: #f1f5f9;
+            --btn-shortcut-text: #334155;
+            --btn-shortcut-hover-bg: #dbeafe;
             --youtube-color: #ff0000;
             --tiktok-color: #000000;
+            --radius: 10px;
+            --transition: 0.2s ease;
         }
 
+        /* ===== Dark mode ===== */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+                --card-bg: #1e293b;
+                --text-main: #f1f5f9;
+                --text-muted: #94a3b8;
+                --border-color: #334155;
+                --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+                --btn-shortcut-bg: #334155;
+                --btn-shortcut-text: #e2e8f0;
+                --btn-shortcut-hover-bg: #475569;
+                --primary-light: #2d2f5e;
+            }
+            input[type="text"] {
+                background-color: #0f172a;
+                color: #f1f5f9;
+                border-color: #334155;
+            }
+            input[type="text"]:focus {
+                background-color: #1e293b;
+                border-color: var(--primary);
+                box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.25);
+            }
+            .quick-link-btn {
+                background-color: #334155;
+                color: #e2e8f0;
+                border-color: #475569;
+            }
+            .quick-link-btn:hover {
+                background-color: #475569;
+                color: var(--primary);
+                border-color: #64748b;
+            }
+            .social-btn.tiktok {
+                background-color: #1a1a1a;
+            }
+        }
+
+        /* ===== Reset & base ===== */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -37,6 +81,7 @@
             background: var(--bg-gradient);
             min-height: 100vh;
             padding: 30px 20px;
+            transition: background var(--transition), color var(--transition);
         }
 
         .container {
@@ -44,6 +89,7 @@
             margin: 0 auto;
         }
 
+        /* ===== Header ===== */
         header {
             text-align: center;
             margin-bottom: 30px;
@@ -52,9 +98,9 @@
         header h1 {
             font-size: 2rem;
             font-weight: 700;
-            color: var(--text-main);
             letter-spacing: -0.02em;
             margin-bottom: 8px;
+            color: var(--text-main);
         }
 
         header p {
@@ -62,28 +108,23 @@
             font-size: 0.95rem;
         }
 
+        /* ===== Main card ===== */
         main {
             background: var(--card-bg);
             padding: 32px;
             border-radius: 16px;
             box-shadow: var(--shadow);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-        }
-
-        h2 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: background var(--transition), border var(--transition);
         }
 
         .section-desc {
             color: var(--text-muted);
             font-size: 0.9rem;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
-        /* Search Container */
+        /* ===== Search ===== */
         .search-container {
             margin-bottom: 32px;
         }
@@ -93,16 +134,27 @@
             gap: 10px;
         }
 
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
         input[type="text"] {
             flex: 1;
             padding: 14px 18px;
             font-size: 0.95rem;
             border: 1.5px solid var(--border-color);
-            border-radius: 10px;
+            border-radius: var(--radius);
             outline: none;
             background-color: #f8fafc;
             color: var(--text-main);
-            transition: all 0.2s ease;
+            transition: all var(--transition);
         }
 
         input[type="text"]:focus {
@@ -115,56 +167,64 @@
             padding: 14px 24px;
             font-size: 0.95rem;
             background-color: var(--primary);
-            color: white;
+            color: #fff;
             border: none;
-            border-radius: 10px;
+            border-radius: var(--radius);
             cursor: pointer;
             font-weight: 600;
             white-space: nowrap;
-            transition: all 0.2s ease;
+            transition: all var(--transition);
             box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
         }
 
         button[type="submit"]:hover {
             background-color: var(--primary-hover);
-            transform: translateY(-1px);
+            transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
         }
 
-        /* Quick Links */
+        /* ===== Quick links ===== */
         .quick-links-section {
             padding-top: 24px;
             border-top: 1px solid var(--border-color);
         }
 
-        .quick-links-grid {
+        #quick-links-container {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             margin-top: 12px;
+            min-height: 44px; /* giữ chỗ khi chưa có nút */
         }
 
         .quick-link-btn {
             display: inline-block;
-            background-color: #f1f5f9;
-            color: #334155;
+            background-color: var(--btn-shortcut-bg);
+            color: var(--btn-shortcut-text);
             padding: 9px 16px;
             text-decoration: none;
             border-radius: 8px;
             font-weight: 500;
             font-size: 0.9rem;
             border: 1px solid var(--border-color);
-            transition: all 0.2s ease;
+            transition: all var(--transition);
         }
 
         .quick-link-btn:hover {
-            background-color: #e2e8f0;
+            background-color: var(--btn-shortcut-hover-bg);
             color: var(--primary);
             border-color: #cbd5e1;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
         }
 
-        /* Social Channel Buttons (Đã chuyển xuống dưới) */
+        .quick-link-empty {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            padding: 6px 0;
+        }
+
+        /* ===== Social footer ===== */
         .social-channels-footer {
             display: flex;
             justify-content: center;
@@ -179,19 +239,21 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 20px;
+            padding: 10px 22px;
             border-radius: 20px;
             font-size: 0.875rem;
             font-weight: 600;
             text-decoration: none;
             color: #ffffff;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            transition: all var(--transition);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            min-width: 130px;
+            justify-content: center;
         }
 
         .social-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
         }
 
         .social-btn.youtube {
@@ -202,7 +264,11 @@
             background-color: var(--tiktok-color);
         }
 
-        /* Responsive UI */
+        .social-btn svg {
+            flex-shrink: 0;
+        }
+
+        /* ===== Responsive ===== */
         @media (max-width: 600px) {
             .search-form {
                 flex-direction: column;
@@ -214,57 +280,86 @@
                 padding: 20px;
             }
         }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.6rem;
+            }
+            .social-btn {
+                min-width: 110px;
+                padding: 8px 16px;
+                font-size: 0.8rem;
+            }
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
         <header>
-            <h1>Tìm Kiếm & Lối Tắt Web</h1>
+            <h1>Tìm Kiếm &amp; Lối Tắt Web</h1>
             <p>Tìm kiếm trực tiếp trên Google với các tham số tự động tắt bộ lọc</p>
         </header>
 
         <main>
-            <!-- Form tìm kiếm gửi đến Google -->
+            <!-- Tìm kiếm -->
             <div class="search-container">
-                <h2>Ô Tìm Kiếm Không Lọc (Unfiltered)</h2>
                 <p class="section-desc">Hãy thử nhập code phim vào ô bên dưới nếu bạn không tìm được kết quả mong muốn.</p>
-                
+
                 <form action="https://www.google.com/search" method="GET" target="_blank" class="search-form">
-                    <input type="text" name="q" placeholder="Nhập từ khóa cần tìm kiếm..." required>
-                    
-                    <!-- Các tham số ẩn tắt lọc -->
-                    <input type="hidden" name="safe" value="off"> <!-- Tắt SafeSearch -->
-                    <input type="hidden" name="pws" value="0">   <!-- Tắt Cá nhân hóa -->
+                    <label for="search-input" class="sr-only">Nhập từ khóa tìm kiếm</label>
+                    <input type="text" name="q" id="search-input" placeholder="Nhập từ khóa cần tìm kiếm..." required />
+
+                    <!-- Tắt SafeSearch và cá nhân hóa -->
+                    <input type="hidden" name="safe" value="off" />
+                    <input type="hidden" name="pws" value="0" />
 
                     <button type="submit">Tìm trên Google</button>
                 </form>
             </div>
 
-            <!-- Khu vực hiển thị các nút chuyển hướng từ JS -->
+            <!-- Shortcuts -->
             <div class="quick-links-section">
-                <h2>Trang Web Thường Truy Cập</h2>
-                <p class="section-desc">Các trang web tôi hay truy cập:</p>
-                <div id="quick-links-container" class="quick-links-grid">
-                    <!-- Các nút sẽ tự động được thêm vào đây bằng JavaScript từ file sites.js -->
+                <p class="section-desc">Có thể cần bật VPN mới có thể truy cập được các web bên dưới:</p>
+                <div id="quick-links-container">
+                    <!-- JavaScript sẽ chèn nút vào đây -->
                 </div>
             </div>
 
-            <!-- Các nút Social Media đặt ở dưới cùng -->
+            <!-- Social -->
             <div class="social-channels-footer">
                 <a href="https://www.youtube.com/@R%C3%ACViuPhimNh%E1%BA%ADt/" target="_blank" class="social-btn youtube">
-                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
                     YouTube
                 </a>
                 <a href="https://www.tiktok.com/@daithanphimnhat" target="_blank" class="social-btn tiktok">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525 0h3.08c.012 1.094.225 2.15.638 3.14.372.888.932 1.683 1.636 2.337.697.647 1.528 1.134 2.437 1.428.937.3 1.916.447 2.904.437v3.25a10.02 10.02 0 0 1-3.876-.84 9.9 9.9 0 0 1-2.92-2.002V15.65c0 1.258-.256 2.503-.75 3.655a8.99 8.99 0 0 1-2.072 2.955 8.93 8.93 0 0 1-3.13 1.95 9.17 9.17 0 0 1-3.702.43 9.07 9.07 0 0 1-3.612-.916 9.006 9.006 0 0 1-2.925-2.222 8.92 8.92 0 0 1-1.89-3.172A9.13 9.13 0 0 1 .01 14.5c0-1.282.26-2.55.764-3.722a8.99 8.99 0 0 1 2.112-3.01 8.93 8.93 0 0 1 3.192-1.99 9.17 9.17 0 0 1 3.774-.442c.866.05 1.722.228 2.535.53v3.315a5.75 5.75 0 0 0-1.666-.25 5.8 5.8 0 0 0-2.38.5 5.67 5.67 0 0 0-1.93 1.34 5.72 5.72 0 0 0-1.3 2.01 5.83 5.83 0 0 0-.47 2.402c0 .852.176 1.692.518 2.47a5.72 5.72 0 0 0 1.432 1.99 5.67 5.67 0 0 0 2.13 1.26c.806.28 1.666.35 2.502.208a5.75 5.75 0 0 0 2.258-.87 5.7 5.7 0 0 0 1.648-1.7 5.83 5.83 0 0 0 .822-2.378c.03-.438.04-.878.03-1.318V0z"/></svg>
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12.525 0h3.08c.012 1.094.225 2.15.638 3.14.372.888.932 1.683 1.636 2.337.697.647 1.528 1.134 2.437 1.428.937.3 1.916.447 2.904.437v3.25a10.02 10.02 0 0 1-3.876-.84 9.9 9.9 0 0 1-2.92-2.002V15.65c0 1.258-.256 2.503-.75 3.655a8.99 8.99 0 0 1-2.072 2.955 8.93 8.93 0 0 1-3.13 1.95 9.17 9.17 0 0 1-3.702.43 9.07 9.07 0 0 1-3.612-.916 9.006 9.006 0 0 1-2.925-2.222 8.92 8.92 0 0 1-1.89-3.172A9.13 9.13 0 0 1 .01 14.5c0-1.282.26-2.55.764-3.722a8.99 8.99 0 0 1 2.112-3.01 8.93 8.93 0 0 1 3.192-1.99 9.17 9.17 0 0 1 3.774-.442c.866.05 1.722.228 2.535.53v3.315a5.75 5.75 0 0 0-1.666-.25 5.8 5.8 0 0 0-2.38.5 5.67 5.67 0 0 0-1.93 1.34 5.72 5.72 0 0 0-1.3 2.01 5.83 5.83 0 0 0-.47 2.402c0 .852.176 1.692.518 2.47a5.72 5.72 0 0 0 1.432 1.99 5.67 5.67 0 0 0 2.13 1.26c.806.28 1.666.35 2.502.208a5.75 5.75 0 0 0 2.258-.87 5.7 5.7 0 0 0 1.648-1.7 5.83 5.83 0 0 0 .822-2.378c.03-.438.04-.878.03-1.318V0z"/>
+                    </svg>
                     TikTok
                 </a>
             </div>
         </main>
     </div>
 
-    <!-- Nhúng file JavaScript quản lý danh sách URL -->
+    <!-- ===== File sites.js (bên ngoài) ===== -->
     <script src="sites.js"></script>
+
+    <!-- ===== Inline script xử lý hiển thị shortcut và thông báo trống ===== -->
+    <script>
+        // Đợi DOM tải xong và chắc chắn sites.js đã được thực thi
+        document.addEventListener('DOMContentLoaded', function() {
+            var container = document.getElementById('quick-links-container');
+            // Nếu container vẫn trống (không có phần tử con nào), hiển thị thông báo
+            if (container.children.length === 0) {
+                var emptyMsg = document.createElement('span');
+                emptyMsg.className = 'quick-link-empty';
+                emptyMsg.textContent = 'Chưa có shortcut nào được thêm.';
+                container.appendChild(emptyMsg);
+            }
+        });
+    </script>
 </body>
 </html>
