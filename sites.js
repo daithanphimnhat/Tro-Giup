@@ -5,7 +5,10 @@ const quickLinks = [
     { title: "javtrailers", url: "https://javtrailers.com/" },
     { title: "Javhd.today", url: "https://javhd.today/" },
     { title: "Xchina", url: "https://en.xchina.co/" },
+    { title: "Pornhub", url: "https://www.pornhub.com/" },
+    { title: "xhamster", url: "https://www.google.com/search?q=xhamter&safe=off&pws=0" },
     { title: "MissAV", url: "https://www.google.com/search?q=missav&safe=off&pws=0&filter=0" }
+
 ];
 
 // Tự động tạo các nút bấm giao diện khi trang web tải xong
