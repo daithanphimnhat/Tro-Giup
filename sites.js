@@ -4,6 +4,7 @@
 const quickLinks = [
     { title: "javtrailers", url: "https://javtrailers.com/" },
     { title: "Javhd.today", url: "https://javhd.today/" },
+    { title: "Xchina", url: "https://en.xchina.co/" },
     { title: "MissAV", url: "https://www.google.com/search?q=missav&safe=off&pws=0&filter=0" }
 ];
 
