@@ -6,6 +6,8 @@ const quickLinks = [
     { title: "Javhd.today", url: "https://javhd.today/" },
     { title: "Xchina", url: "https://en.xchina.co/" },
     { title: "Pornhub", url: "https://www.pornhub.com/" },
+    { title: "JAVGG.NET", url: "https://javgg.net/" },
+    { title: "AVO1", url: "https://www.av01.media/" },
     { title: "xhamster", url: "https://www.google.com/search?q=xhamter&safe=off&pws=0" },
     { title: "MissAV", url: "https://www.google.com/search?q=missav&safe=off&pws=0&filter=0" }
 
