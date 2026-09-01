@@ -7,6 +7,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    
+    <!-- Thư viện giải mã QR Code trực tiếp trên trình duyệt -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+
     <style>
         /* ===== Biến toàn cục ===== */
         :root {
@@ -15,9 +19,9 @@
             --primary-light: #eef2ff;
             --bg-gradient: linear-gradient(135deg, #f0f4ff 0%, #e8eefb 100%);
             --card-bg: #ffffff;
-            --text-main: #1e293b;
+            --text-main: #0f172a;
             --text-muted: #475569;
-            --border-color: #e2e8f0;
+            --border-color: #cbd5e1;
             --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
             --btn-shortcut-bg: #f1f5f9;
             --btn-shortcut-text: #334155;
@@ -32,6 +36,7 @@
             --info-text: #1e40af;
             --radius: 12px;
             --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --input-bg: #ffffff;
         }
 
         /* ===== Dark mode ===== */
@@ -39,9 +44,9 @@
             :root {
                 --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
                 --card-bg: #1e293b;
-                --text-main: #f1f5f9;
+                --text-main: #f8fafc;
                 --text-muted: #94a3b8;
-                --border-color: #334155;
+                --border-color: #475569;
                 --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
                 --btn-shortcut-bg: #334155;
                 --btn-shortcut-text: #e2e8f0;
@@ -53,30 +58,7 @@
                 --info-bg: #1e293b;
                 --info-border: #1e3a8a;
                 --info-text: #93c5fd;
-            }
-            input[type="text"] {
-                background-color: #0f172a;
-                color: #f1f5f9;
-                border-color: #334155;
-            }
-            input[type="text"]:focus {
-                background-color: #1e293b;
-                border-color: var(--primary);
-                box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.25);
-            }
-            .quick-link-btn {
-                background-color: #334155;
-                color: #e2e8f0;
-                border-color: #475569;
-            }
-            .quick-link-btn:hover {
-                background-color: #475569;
-                color: #818cf8;
-                border-color: #64748b;
-            }
-            .social-btn.tiktok {
-                background-color: #000000;
-                border: 1px solid #334155;
+                --input-bg: #0f172a;
             }
         }
 
@@ -148,7 +130,6 @@
             margin-bottom: 24px;
             font-size: 0.92rem;
             line-height: 1.5;
-            position: relative;
         }
 
         .info-box-vpn strong {
@@ -177,7 +158,7 @@
             margin-bottom: 4px;
         }
 
-        /* ===== Search ===== */
+        /* ===== Search Section (Fix màu text & thêm icon) ===== */
         .search-container {
             margin-bottom: 32px;
         }
@@ -185,6 +166,13 @@
         .search-form {
             display: flex;
             gap: 10px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
         }
 
         .sr-only {
@@ -199,21 +187,57 @@
         }
 
         input[type="text"] {
-            flex: 1;
-            padding: 14px 18px;
+            width: 100%;
+            padding: 14px 75px 14px 18px; /* Dành khoảng trống cho 2 nút Icon bên phải */
             font-size: 0.95rem;
+            font-weight: 500;
             border: 1.5px solid var(--border-color);
             border-radius: var(--radius);
             outline: none;
-            background-color: #f8fafc;
-            color: var(--text-main);
+            background-color: var(--input-bg);
+            color: var(--text-main) !important;
             transition: all var(--transition);
         }
 
+        input[type="text"]::placeholder {
+            color: var(--text-muted);
+            opacity: 0.8;
+        }
+
         input[type="text"]:focus {
-            background-color: #ffffff;
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+        }
+
+        /* Nút thao tác bên trong Input */
+        .input-actions {
+            position: absolute;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background var(--transition), color var(--transition);
+        }
+
+        .icon-btn:hover {
+            background-color: rgba(148, 163, 184, 0.2);
+            color: var(--primary);
+        }
+
+        .clear-btn {
+            display: none; /* Mặc định ẩn, chỉ hiện khi có text */
         }
 
         button[type="submit"] {
@@ -326,10 +350,7 @@
 
         .social-btn.tiktok {
             background-color: var(--tiktok-color);
-        }
-
-        .social-btn svg {
-            flex-shrink: 0;
+            border: 1px solid var(--border-color);
         }
 
         /* ===== Responsive ===== */
@@ -342,17 +363,6 @@
             }
             main {
                 padding: 24px 18px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            header h1 {
-                font-size: 1.7rem;
-            }
-            .social-btn {
-                min-width: 120px;
-                padding: 9px 18px;
-                font-size: 0.85rem;
             }
         }
     </style>
@@ -374,20 +384,42 @@
 
             <!-- Tìm kiếm -->
             <div class="search-container">
-                <p class="section-desc">Nhập từ khóa hoặc mã phim bạn cần tìm kiếm vào ô bên dưới:</p>
+                <p class="section-desc">Nhập từ khóa, mã phim hoặc chọn ảnh (chứa QR code / hình ảnh):</p>
 
-                <form action="https://www.google.com/search" method="GET" target="_blank" class="search-form">
+                <form action="https://www.google.com/search" method="GET" target="_blank" class="search-form" id="search-form">
                     <label for="search-input" class="sr-only">Nhập từ khóa tìm kiếm</label>
-                    <input type="text" name="q" id="search-input" placeholder="Nhập từ khóa hoặc mã phim cần tìm..." required />
+                    
+                    <div class="input-wrapper">
+                        <input type="text" name="q" id="search-input" placeholder="Nhập từ khóa hoặc mã phim cần tìm..." required autocomplete="off" />
+                        
+                        <div class="input-actions">
+                            <!-- Nút xóa text -->
+                            <button type="button" class="icon-btn clear-btn" id="clear-btn" title="Xóa văn bản">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+                            </button>
+                            
+                            <!-- Nút quét ảnh / QR Code -->
+                            <button type="button" class="icon-btn" id="image-search-btn" title="Tìm kiếm bằng hình ảnh / Mã QR">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+                            </button>
+                        </div>
+                    </div>
 
-                    <!-- Tắt SafeSearch, cá nhân hóa và chuyển vùng sang Mỹ -->
+                    <!-- Input ẩn để upload file ảnh -->
+                    <input type="file" id="image-input" accept="image/*" style="display: none;" />
+
+                    <!-- Tham số tối ưu Google -->
                     <input type="hidden" name="safe" value="off" />
                     <input type="hidden" name="pws" value="0" />
                     <input type="hidden" name="gl" value="us" />
 
                     <button type="submit">Tìm trên Google</button>
                 </form>
+
+                <!-- Form ẩn hỗ trợ gửi ảnh trực tiếp lên Google Lens -->
+                <form id="google-lens-form" action="https://lens.google.com/uploadbyurl" method="GET" target="_blank" style="display:none;"></form>
             </div>
+
             <!-- Shortcuts -->
             <div class="quick-links-section">
                 <p class="section-desc">Danh sách lối tắt truy cập nhanh (Có thể cần bật VPN để truy cập một số trang web):</p>
@@ -396,21 +428,21 @@
                 </div>
             </div>
 
-<!-- Cảnh báo & Tuyên bố miễn trừ trách nhiệm -->
-<div class="disclaimer-box">
-    ⚠️ <strong>Lưu ý quan trọng &amp; Miễn trừ trách nhiệm:</strong>
-    <ul>
-        <li>🔞 <strong>Cảnh báo độ tuổi:</strong> Trang web có chứa thông tin/liên kết liên quan đến nội dung dành cho người lớn. Bạn <strong>bắt buộc phải đủ 18 tuổi trở lên</strong> mới được phép tiếp cận các nội dung này. Trường hợp chưa đủ 18 tuổi, vui lòng tuyệt đối không truy cập hay xem dưới mọi hình thức. Người dùng <strong>tự chịu toàn bộ trách nhiệm pháp lý</strong> liên quan đến hành vi truy cập và sử dụng thông tin.</li>
-        <li>Các nội dung phim/giải trí dành cho người lớn (nếu có) chỉ mang tính chất <strong>giải trí thuần túy</strong>. Tuyệt đối <strong>không nên lạm dụng</strong> gây ảnh hưởng xấu tới sức khỏe và tâm lý.</li>
-        <li>Nội dung trong phim hoàn toàn là kịch bản hư cấu, <strong>không áp dụng vào thực tế</strong> dưới mọi hình thức.</li>
-        <li>Người dùng cần tuân thủ quy định pháp luật hiện hành và <strong>tự chịu mọi trách nhiệm pháp lý</strong> liên quan đến hành vi truy cập cũng như sử dụng thông tin của bản thân.</li>
-    </ul>
-</div>
+            <!-- Cảnh báo & Tuyên bố miễn trừ trách nhiệm -->
+            <div class="disclaimer-box">
+                ⚠️ <strong>Lưu ý quan trọng &amp; Miễn trừ trách nhiệm:</strong>
+                <ul>
+                    <li>🔞 <strong>Cảnh báo độ tuổi:</strong> Trang web có chứa thông tin/liên kết liên quan đến nội dung dành cho người lớn. Bạn <strong>bắt buộc phải đủ 18 tuổi trở lên</strong> mới được phép tiếp cận các nội dung này. Trường hợp chưa đủ 18 tuổi, vui lòng tuyệt đối không truy cập hay xem dưới mọi hình thức. Người dùng <strong>tự chịu toàn bộ trách nhiệm pháp lý</strong> liên quan đến hành vi truy cập và sử dụng thông tin.</li>
+                    <li>Các nội dung phim/giải trí dành cho người lớn (nếu có) chỉ mang tính chất <strong>giải trí thuần túy</strong>. Tuyệt đối <strong>không nên lạm dụng</strong> gây ảnh hưởng xấu tới sức khỏe và tâm lý.</li>
+                    <li>Nội dung trong phim hoàn toàn là kịch bản hư cấu, <strong>không áp dụng vào thực tế</strong> dưới mọi hình thức.</li>
+                    <li>Người dùng cần tuân thủ quy định pháp luật hiện hành và <strong>tự chịu mọi trách nhiệm pháp lý</strong> liên quan đến hành vi truy cập cũng như sử dụng thông tin của bản thân.</li>
+                </ul>
+            </div>
+
             <!-- Social Footer -->
             <div class="social-section">
                 <p class="social-support-text">❤️ Nếu rảnh hãy thử tham quan các kênh chính thức của tôi:</p>
                 <div class="social-channels-footer">
-                    
                     <a href="https://www.tiktok.com/@daithanphimnhat" target="_blank" class="social-btn tiktok">
                         <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M12.525 0h3.08c.012 1.094.225 2.15.638 3.14.372.888.932 1.683 1.636 2.337.697.647 1.528 1.134 2.437 1.428.937.3 1.916.447 2.904.437v3.25a10.02 10.02 0 0 1-3.876-.84 9.9 9.9 0 0 1-2.92-2.002V15.65c0 1.258-.256 2.503-.75 3.655a8.99 8.99 0 0 1-2.072 2.955 8.93 8.93 0 0 1-3.13 1.95 9.17 9.17 0 0 1-3.702.43 9.07 9.07 0 0 1-3.612-.916 9.006 9.006 0 0 1-2.925-2.222 8.92 8.92 0 0 1-1.89-3.172A9.13 9.13 0 0 1 .01 14.5c0-1.282.26-2.55.764-3.722a8.99 8.99 0 0 1 2.112-3.01 8.93 8.93 0 0 1 3.192-1.99 9.17 9.17 0 0 1 3.774-.442c.866.05 1.722.228 2.535.53v3.315a5.75 5.75 0 0 0-1.666-.25 5.8 5.8 0 0 0-2.38.5 5.67 5.67 0 0 0-1.93 1.34 5.72 5.72 0 0 0-1.3 2.01 5.83 5.83 0 0 0-.47 2.402c0 .852.176 1.692.518 2.47a5.72 5.72 0 0 0 1.432 1.99 5.67 5.67 0 0 0 2.13 1.26c.806.28 1.666.35 2.502.208a5.75 5.75 0 0 0 2.258-.87 5.7 5.7 0 0 0 1.648-1.7 5.83 5.83 0 0 0 .822-2.378c.03-.438.04-.878.03-1.318V0z"/>
@@ -425,7 +457,7 @@
     <!-- ===== File sites.js (bên ngoài) ===== -->
     <script src="sites.js"></script>
 
-    <!-- ===== Inline script xử lý hiển thị shortcut và thông báo trống ===== -->
+    <!-- ===== Script Xử Lý Chính ===== -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var container = document.getElementById('quick-links-container');
@@ -435,6 +467,90 @@
                 emptyMsg.textContent = 'Chưa có shortcut nào được thêm.';
                 container.appendChild(emptyMsg);
             }
+
+            // === 1. Xử lý Nút Xóa Text (Clear Button) ===
+            var searchInput = document.getElementById('search-input');
+            var clearBtn = document.getElementById('clear-btn');
+            var searchForm = document.getElementById('search-form');
+
+            function toggleClearBtn() {
+                if (searchInput.value.trim().length > 0) {
+                    clearBtn.style.display = 'inline-flex';
+                } else {
+                    clearBtn.style.display = 'none';
+                }
+            }
+
+            searchInput.addEventListener('input', toggleClearBtn);
+
+            clearBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                toggleClearBtn();
+                searchInput.focus();
+            });
+
+            // === 2. Xử lý Tìm kiếm bằng Hình ảnh & Mã QR ===
+            var imgBtn = document.getElementById('image-search-btn');
+            var imgInput = document.getElementById('image-input');
+
+            imgBtn.addEventListener('click', function() {
+                imgInput.click();
+            });
+
+            imgInput.addEventListener('change', function(e) {
+                var file = e.target.files[0];
+                if (!file) return;
+
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    var img = new Image();
+                    img.onload = function() {
+                        // Tạo Canvas ẩn để phân tích dữ liệu ảnh
+                        var canvas = document.createElement('canvas');
+                        var ctx = canvas.getContext('2d');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0, img.width, img.height);
+                        
+                        var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        
+                        // Quét Mã QR thông qua jsQR
+                        var qrCode = jsQR(imageData.data, imageData.width, imageData.height);
+
+                        if (qrCode) {
+                            var qrData = qrCode.data.trim();
+                            
+                            // Kiểm tra xem dữ liệu QR có phải là URL không
+                            var isUrl = false;
+                            try {
+                                var parsedUrl = new URL(qrData);
+                                isUrl = parsedUrl.protocol === "http:" || parsedUrl.protocol === "https:";
+                            } catch (_) {
+                                isUrl = false;
+                            }
+
+                            if (isUrl) {
+                                // Nếu là Link: Tự động chuyển hướng / mở link
+                                window.open(qrData, '_blank');
+                            } else {
+                                // Nếu là Text: Điền ô tìm kiếm và submit Google
+                                searchInput.value = qrData;
+                                toggleClearBtn();
+                                searchForm.submit();
+                            }
+                        } else {
+                            // Không tìm thấy Mã QR -> Chuyển sang tìm kiếm hình ảnh bằng Google Lens
+                            alert("Không phát hiện mã QR trong ảnh. Hệ thống sẽ chuyển hướng ảnh sang Google Lens để tìm kiếm.");
+                            window.open('https://lens.google.com/', '_blank');
+                        }
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+                
+                // Reset input file
+                imgInput.value = '';
+            });
         });
     </script>
 </body>
