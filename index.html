@@ -26,8 +26,6 @@
             --btn-shortcut-bg: #f1f5f9;
             --btn-shortcut-text: #334155;
             --btn-shortcut-hover-bg: #dbeafe;
-            --youtube-color: #ff0000;
-            --tiktok-color: #000000;
             --warning-bg: #fffbebf5;
             --warning-border: #fef08a;
             --warning-text: #854d0e;
@@ -79,6 +77,7 @@
             min-height: 100vh;
             padding: 40px 20px;
             transition: background var(--transition), color var(--transition);
+            position: relative;
         }
 
         .container {
@@ -280,13 +279,40 @@
             opacity: 0;
             transform: translateY(20px);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 9999;
+            z-index: 10001;
             pointer-events: none;
         }
 
         .toast-notification.show {
             opacity: 1;
             transform: translateY(0);
+        }
+
+        /* ===== Global Drag & Drop Overlay ===== */
+        .drag-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(79, 70, 229, 0.12);
+            border: 4px dashed var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            backdrop-filter: blur(2px);
+            transition: opacity 0.2s ease;
+        }
+
+        .drag-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
         }
 
         /* ===== Quick links ===== */
@@ -374,7 +400,7 @@
         }
 
         .social-btn.tiktok {
-            background-color: var(--tiktok-color);
+            background-color: #000000;
             border: 1px solid var(--border-color);
         }
 
@@ -394,6 +420,9 @@
 </head>
 <body>
 
+    <!-- Khung thông báo khi kéo thả ảnh toàn màn hình -->
+    <div id="drag-overlay" class="drag-overlay">📁 Thả ảnh vào đây để phân tích...</div>
+
     <div class="container">
         <header>
             <h1>Đại thần phim nhật</h1>
@@ -401,22 +430,22 @@
         </header>
 
         <main>
-            <!-- Khung thông báo Mẹo VPN & Tắt Lọc (Đã cập nhật nội dung mới) -->
+            <!-- Khung thông báo Mẹo VPN & Tắt Lọc -->
             <div class="info-box-vpn">
-                💡 <strong>Mẹo tìm kiếm hiệu quả:</strong><br />
-                - Bạn có thể <strong>dán (Ctrl+V) hoặc chọn ảnh</strong> vào ô tìm kiếm. Đối với các ảnh có mã QR, hệ thống sẽ tự động quét phân tích: Nếu là liên kết (link) sẽ chuyển đến trang web, nếu là văn bản/mã sẽ tự tìm trên Google. Trường hợp ảnh <strong>không có mã QR</strong>, hệ thống sẽ tự động chuyển sang <strong>Google Lens</strong> để tìm kiếm hình ảnh.<br />
-                - Nếu bị chặn truy cập, hãy thử <strong>bật VPN</strong> kết hợp tắt lọc hoặc nhập thẳng thông tin vào đây — hệ thống sẽ tự động tối ưu cho bạn!
-            </div>
+    💡 <strong>Mẹo tìm kiếm hiệu quả:</strong><br />
+    - Bạn có thể kéo thả hoặc dán hình ảnh vào ô tìm kiếm để tìm nội dung trong mã QR hoặc tìm ảnh liên quan qua Google Lens.<br />
+    - Nếu bạn gặp rắc rối hoặc bị chặn trong việc tìm kiếm thông tin, hãy thử <strong>bật VPN</strong> kết hợp với việc tắt lọc. Nếu bạn thấy các thao tác chuyển đổi hay cài đặt tắt lọc thủ công quá phiền phức, chỉ cần <strong>điền thông tin tìm kiếm ở ô tìm kiếm này</strong> — hệ thống sẽ tự động tối ưu cho bạn!
+</div>
 
             <!-- Tìm kiếm -->
             <div class="search-container">
-                <p class="section-desc">Nhập từ khóa, mã phim hoặc chọn/dán ảnh (Ctrl+V) vào ô bên dưới:</p>
+                <p class="section-desc">Nhập từ khóa, mã phim hoặc kéo thả/chọn/dán ảnh vào trang:</p>
 
                 <form action="https://www.google.com/search" method="GET" target="_blank" class="search-form" id="search-form">
                     <label for="search-input" class="sr-only">Nhập từ khóa tìm kiếm</label>
                     
                     <div class="input-wrapper">
-                        <input type="text" name="q" id="search-input" placeholder="Nhập từ khóa, mã phim hoặc dán ảnh (Ctrl+V)..." required autocomplete="off" />
+                        <input type="text" name="q" id="search-input" placeholder="Nhập từ khóa, mã phim hoặc dán/kéo thả ảnh..." required autocomplete="off" />
                         
                         <div class="input-actions">
                             <!-- Nút xóa text -->
@@ -503,6 +532,7 @@
             var imgBtn = document.getElementById('image-search-btn');
             var imgInput = document.getElementById('image-input');
             var toast = document.getElementById('toast');
+            var dragOverlay = document.getElementById('drag-overlay');
 
             // === 1. Xử lý Nút Xóa Text ===
             function toggleClearBtn() {
@@ -532,9 +562,12 @@
                 }, 3000);
             }
 
-            // === 3. Hàm Phân Tích File Ảnh (Dùng chung cho Upload & Dán Ctrl+V) ===
+            // === 3. Hàm Phân Tích File Ảnh (Dùng chung cho Upload, Paste & Drag-Drop) ===
             function processImageFile(file) {
-                if (!file || !file.type.startsWith('image/')) return;
+                if (!file || !file.type.startsWith('image/')) {
+                    alert("Vui lòng tải lên một tệp hình ảnh hợp lệ!");
+                    return;
+                }
 
                 showToast("Đã tải ảnh lên thành công! Đang phân tích...");
 
@@ -600,11 +633,45 @@
                 var items = (e.clipboardData || e.originalEvent.clipboardData).items;
                 for (var i = 0; i < items.length; i++) {
                     if (items[i].type.indexOf('image') !== -1) {
-                        e.preventDefault(); // Ngăn chặn dán chuỗi ký tự lạ nếu có
+                        e.preventDefault();
                         var file = items[i].getAsFile();
                         processImageFile(file);
                         break;
                     }
+                }
+            });
+
+            // === 6. Xử lý Kéo & Thả Ảnh Toàn Cửa Sổ (Drag and Drop Window-wide) ===
+            var dragCounter = 0;
+
+            window.addEventListener('dragenter', function(e) {
+                e.preventDefault();
+                dragCounter++;
+                if (e.dataTransfer.types && Array.from(e.dataTransfer.types).includes('Files')) {
+                    dragOverlay.classList.add('active');
+                }
+            });
+
+            window.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                dragCounter--;
+                if (dragCounter === 0) {
+                    dragOverlay.classList.remove('active');
+                }
+            });
+
+            window.addEventListener('dragover', function(e) {
+                e.preventDefault(); // Cần thiết để cho phép thả file
+            });
+
+            window.addEventListener('drop', function(e) {
+                e.preventDefault();
+                dragCounter = 0;
+                dragOverlay.classList.remove('active');
+
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    var file = e.dataTransfer.files[0];
+                    processImageFile(file);
                 }
             });
         });
