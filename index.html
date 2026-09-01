@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     
-    <!-- Thư viện giải mã QR Code trực tiếp trên trình duyệt -->
+    <!-- Thư viện giải mã QR Code -->
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 
     <style>
@@ -37,6 +37,8 @@
             --radius: 12px;
             --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             --input-bg: #ffffff;
+            --toast-bg: #10b981;
+            --toast-text: #ffffff;
         }
 
         /* ===== Dark mode ===== */
@@ -158,7 +160,7 @@
             margin-bottom: 4px;
         }
 
-        /* ===== Search Section (Fix màu text & thêm icon) ===== */
+        /* ===== Search Section ===== */
         .search-container {
             margin-bottom: 32px;
         }
@@ -188,7 +190,7 @@
 
         input[type="text"] {
             width: 100%;
-            padding: 14px 75px 14px 18px; /* Dành khoảng trống cho 2 nút Icon bên phải */
+            padding: 14px 75px 14px 18px;
             font-size: 0.95rem;
             font-weight: 500;
             border: 1.5px solid var(--border-color);
@@ -237,7 +239,7 @@
         }
 
         .clear-btn {
-            display: none; /* Mặc định ẩn, chỉ hiện khi có text */
+            display: none;
         }
 
         button[type="submit"] {
@@ -258,6 +260,33 @@
             background-color: var(--primary-hover);
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
+        }
+
+        /* ===== Toast Notification ===== */
+        .toast-notification {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background-color: var(--toast-bg);
+            color: var(--toast-text);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         /* ===== Quick links ===== */
@@ -344,10 +373,6 @@
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
         }
 
-        .social-btn.youtube {
-            background-color: var(--youtube-color);
-        }
-
         .social-btn.tiktok {
             background-color: var(--tiktok-color);
             border: 1px solid var(--border-color);
@@ -376,21 +401,22 @@
         </header>
 
         <main>
-            <!-- Khung thông báo Mẹo VPN & Tắt Lọc -->
+            <!-- Khung thông báo Mẹo VPN & Tắt Lọc (Đã cập nhật nội dung mới) -->
             <div class="info-box-vpn">
                 💡 <strong>Mẹo tìm kiếm hiệu quả:</strong><br />
-                Nếu bạn gặp rắc rối hoặc bị chặn trong việc tìm kiếm thông tin, hãy thử <strong>bật VPN</strong> kết hợp với việc tắt lọc. Nếu bạn thấy các thao tác chuyển đổi hay cài đặt tắt lọc thủ công quá phiền phức, chỉ cần <strong>điền thông tin tìm kiếm ở ô tìm kiếm này</strong> — hệ thống sẽ tự động tối ưu cho bạn!
+                - Bạn có thể <strong>dán (Ctrl+V) hoặc chọn ảnh</strong> vào ô tìm kiếm. Đối với các ảnh có mã QR, hệ thống sẽ tự động quét phân tích: Nếu là liên kết (link) sẽ chuyển đến trang web, nếu là văn bản/mã sẽ tự tìm trên Google. Trường hợp ảnh <strong>không có mã QR</strong>, hệ thống sẽ tự động chuyển sang <strong>Google Lens</strong> để tìm kiếm hình ảnh.<br />
+                - Nếu bị chặn truy cập, hãy thử <strong>bật VPN</strong> kết hợp tắt lọc hoặc nhập thẳng thông tin vào đây — hệ thống sẽ tự động tối ưu cho bạn!
             </div>
 
             <!-- Tìm kiếm -->
             <div class="search-container">
-                <p class="section-desc">Nhập từ khóa, mã phim hoặc chọn ảnh (chứa QR code / hình ảnh):</p>
+                <p class="section-desc">Nhập từ khóa, mã phim hoặc chọn/dán ảnh (Ctrl+V) vào ô bên dưới:</p>
 
                 <form action="https://www.google.com/search" method="GET" target="_blank" class="search-form" id="search-form">
                     <label for="search-input" class="sr-only">Nhập từ khóa tìm kiếm</label>
                     
                     <div class="input-wrapper">
-                        <input type="text" name="q" id="search-input" placeholder="Nhập từ khóa hoặc mã phim cần tìm..." required autocomplete="off" />
+                        <input type="text" name="q" id="search-input" placeholder="Nhập từ khóa, mã phim hoặc dán ảnh (Ctrl+V)..." required autocomplete="off" />
                         
                         <div class="input-actions">
                             <!-- Nút xóa text -->
@@ -398,8 +424,8 @@
                                 <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
                             </button>
                             
-                            <!-- Nút quét ảnh / QR Code -->
-                            <button type="button" class="icon-btn" id="image-search-btn" title="Tìm kiếm bằng hình ảnh / Mã QR">
+                            <!-- Nút chọn ảnh / QR Code -->
+                            <button type="button" class="icon-btn" id="image-search-btn" title="Chọn ảnh / Mã QR từ thiết bị">
                                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><circle cx="12" cy="13" r="3"></circle></svg>
                             </button>
                         </div>
@@ -415,9 +441,6 @@
 
                     <button type="submit">Tìm trên Google</button>
                 </form>
-
-                <!-- Form ẩn hỗ trợ gửi ảnh trực tiếp lên Google Lens -->
-                <form id="google-lens-form" action="https://lens.google.com/uploadbyurl" method="GET" target="_blank" style="display:none;"></form>
             </div>
 
             <!-- Shortcuts -->
@@ -454,6 +477,12 @@
         </main>
     </div>
 
+    <!-- Toast Notification -->
+    <div id="toast" class="toast-notification">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+        <span>Đã tải ảnh lên thành công! Đang phân tích...</span>
+    </div>
+
     <!-- ===== File sites.js (bên ngoài) ===== -->
     <script src="sites.js"></script>
 
@@ -468,11 +497,14 @@
                 container.appendChild(emptyMsg);
             }
 
-            // === 1. Xử lý Nút Xóa Text (Clear Button) ===
             var searchInput = document.getElementById('search-input');
             var clearBtn = document.getElementById('clear-btn');
             var searchForm = document.getElementById('search-form');
+            var imgBtn = document.getElementById('image-search-btn');
+            var imgInput = document.getElementById('image-input');
+            var toast = document.getElementById('toast');
 
+            // === 1. Xử lý Nút Xóa Text ===
             function toggleClearBtn() {
                 if (searchInput.value.trim().length > 0) {
                     clearBtn.style.display = 'inline-flex';
@@ -489,23 +521,27 @@
                 searchInput.focus();
             });
 
-            // === 2. Xử lý Tìm kiếm bằng Hình ảnh & Mã QR ===
-            var imgBtn = document.getElementById('image-search-btn');
-            var imgInput = document.getElementById('image-input');
+            // === 2. Thông báo Toast ===
+            function showToast(message) {
+                if (message) {
+                    toast.querySelector('span').textContent = message;
+                }
+                toast.classList.add('show');
+                setTimeout(function() {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
 
-            imgBtn.addEventListener('click', function() {
-                imgInput.click();
-            });
+            // === 3. Hàm Phân Tích File Ảnh (Dùng chung cho Upload & Dán Ctrl+V) ===
+            function processImageFile(file) {
+                if (!file || !file.type.startsWith('image/')) return;
 
-            imgInput.addEventListener('change', function(e) {
-                var file = e.target.files[0];
-                if (!file) return;
+                showToast("Đã tải ảnh lên thành công! Đang phân tích...");
 
                 var reader = new FileReader();
                 reader.onload = function(event) {
                     var img = new Image();
                     img.onload = function() {
-                        // Tạo Canvas ẩn để phân tích dữ liệu ảnh
                         var canvas = document.createElement('canvas');
                         var ctx = canvas.getContext('2d');
                         canvas.width = img.width;
@@ -514,13 +550,13 @@
                         
                         var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                         
-                        // Quét Mã QR thông qua jsQR
+                        // Quét mã QR
                         var qrCode = jsQR(imageData.data, imageData.width, imageData.height);
 
                         if (qrCode) {
                             var qrData = qrCode.data.trim();
                             
-                            // Kiểm tra xem dữ liệu QR có phải là URL không
+                            // Phân biệt URL hay Text/Mã
                             var isUrl = false;
                             try {
                                 var parsedUrl = new URL(qrData);
@@ -530,26 +566,46 @@
                             }
 
                             if (isUrl) {
-                                // Nếu là Link: Tự động chuyển hướng / mở link
                                 window.open(qrData, '_blank');
                             } else {
-                                // Nếu là Text: Điền ô tìm kiếm và submit Google
                                 searchInput.value = qrData;
                                 toggleClearBtn();
                                 searchForm.submit();
                             }
                         } else {
-                            // Không tìm thấy Mã QR -> Chuyển sang tìm kiếm hình ảnh bằng Google Lens
-                            alert("Không phát hiện mã QR trong ảnh. Hệ thống sẽ chuyển hướng ảnh sang Google Lens để tìm kiếm.");
+                            // Không có QR code -> Chuyển hướng Google Lens
+                            alert("Không phát hiện mã QR trong ảnh. Đang chuyển hướng sang Google Lens để tìm kiếm hình ảnh.");
                             window.open('https://lens.google.com/', '_blank');
                         }
                     };
                     img.src = event.target.result;
                 };
                 reader.readAsDataURL(file);
-                
-                // Reset input file
+            }
+
+            // === 4. Xử lý Chọn Ảnh Từ Nút Upload ===
+            imgBtn.addEventListener('click', function() {
+                imgInput.click();
+            });
+
+            imgInput.addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    processImageFile(e.target.files[0]);
+                }
                 imgInput.value = '';
+            });
+
+            // === 5. Xử lý Dán Ảnh (Ctrl + V / Paste Event) Vào Ô Input ===
+            searchInput.addEventListener('paste', function(e) {
+                var items = (e.clipboardData || e.originalEvent.clipboardData).items;
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i].type.indexOf('image') !== -1) {
+                        e.preventDefault(); // Ngăn chặn dán chuỗi ký tự lạ nếu có
+                        var file = items[i].getAsFile();
+                        processImageFile(file);
+                        break;
+                    }
+                }
             });
         });
     </script>
